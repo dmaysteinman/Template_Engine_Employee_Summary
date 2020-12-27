@@ -11,8 +11,85 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 const render = require("./lib/htmlRenderer");
 
 
+const teamMembers = [];
+
+
 // Write code to use inquirer to gather information about the development team members,
-// and to create objects for each team member (using the correct classes as blueprints!)
+function assembleTeam (){
+    inquirer.prompt([
+        {
+            type: "list",
+            name: "role",
+            message: "select employee type",
+            choices: ["Engineer", "Intern", "Manager"]
+        },
+        {
+            type: "input",
+            name: "name",
+            message: "What is the name of the employee?"
+        },
+        {
+            type: "input",
+            name: "id",
+            message: "What is the employee's ID number?"
+        },
+        {
+            type: "input",
+            name: "email",
+            message: "What is the empoyee's email address?"
+        },
+        {
+            type: "input",
+            name: "officeNumber",
+            message: "What is the manager's office number?",
+            when: function(assembleTeam) {
+                return assembleTeam.role === "Manager";
+            },
+        },
+        {
+            type: "input",
+            name: "github",
+            message: "What is the engineer's github profile?",
+            when: function(assembleTeam) {
+                return assembleTeam.role === "Engineer";
+            },
+        },
+        {
+            type: "input",
+            name: "school",
+            message: "What school does the intern currenty attend?",
+            when: function(assembleTeam) {
+                return assembleTeam.role === "Intern";
+            },
+        },
+        {
+            type: "input",
+            name: "newEmployee",
+            message: "Would you like to add a new employee?",
+        }
+    ]).then((response) => {
+        if (response.role === "Manager") {
+            const manager = new Manager(response.name, response.id, response.email, response.officeNumber);
+            teamMembers.push(Manager);
+            console.log(teamMembers);
+            assembleTeam();
+        }
+        else if (response.role === "Engineer") {
+            const engineer = new Engineer(response.name, response.id, response.email, response.github);
+            teamMembers.push(Engineer);
+            console.log(teamMembers);
+            assembleTeam()
+        }
+        else if (response.role === "Intern") {
+            const intern = new Intern(response.name, response.id, response.email, response.school);
+            teamMembers.push(Intern);
+            console.log(teamMembers);
+            assembleTeam()
+        }
+        
+    });
+};
+
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
